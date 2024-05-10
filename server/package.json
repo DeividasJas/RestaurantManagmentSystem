@@ -1,0 +1,26 @@
+{
+  "name": "restaurantmanagementsystem",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "cross-env NODE_ENV=development nodemon server.mjs",
+    "start": "cross-env NODE_ENV=production nodemon serverProduction.mjs",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@eslint/js": "^9.2.0",
+    "cross-env": "^7.0.3",
+    "eslint": "^9.2.0",
+    "globals": "^15.1.0"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "nodemon": "^3.1.0"
+  }
+}

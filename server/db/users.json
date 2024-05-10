@@ -1,0 +1,29 @@
+[
+  {
+    "name": "Deividas",
+    "email": "lala@gmial.com",
+    "password": "yoyoyo987",
+    "phone": 868652345,
+    "address": "vilnius g.",
+    "orders": [
+      1,
+      2,
+      4,
+      5
+    ],
+    "registered_on": "2024-05-08",
+    "id": 1
+  },
+  {
+    "name": "Agne",
+    "email": "labadienasuVISTIENA@gmial.com",
+    "password": "AgneGraziausia",
+    "phone": 86865745,
+    "address": "kauno g.",
+    "orders": [
+      3
+    ],
+    "registered_on": "2024-05-08",
+    "id": 2
+  }
+]

@@ -1,0 +1,45 @@
+[
+  {
+    "id": 1,
+    "name": "cepelinas",
+    "price": 10,
+    "category": {
+      "appetizer": false,
+      "main-course": true,
+      "dessert": false
+    },
+    "creationDate": "2024-05-09"
+  },
+  {
+    "name": "Duonele",
+    "price": 2,
+    "category": {
+      "appetizer": true,
+      "main-course": false,
+      "dessert": false
+    },
+    "id": 2
+  },
+  {
+    "name": "burger",
+    "price": 15,
+    "category": {
+      "appetizer": false,
+      "main-course": true,
+      "dessert": false
+    },
+    "id": 3,
+    "creationDate": "2024-05-09"
+  },
+  {
+    "name": "vaniles ledai",
+    "price": 5.55,
+    "category": {
+      "appetizer": false,
+      "main-course": false,
+      "dessert": true
+    },
+    "id": 4,
+    "creationDate": "2024-05-09"
+  }
+]
