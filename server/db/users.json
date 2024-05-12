@@ -25,5 +25,33 @@
     ],
     "registered_on": "2024-05-08",
     "id": 2
+  },
+  {
+    "name": "Kaylise",
+    "email": "kaylisevassell@gmial.com",
+    "password": "Kaikai",
+    "phone": 86865745,
+    "address": "winslade g.",
+    "orders": [
+      2,
+      5,
+      4
+    ],
+    "registered_on": "2024-05-12",
+    "id": 3
+  },
+  {
+    "name": "Deividas",
+    "email": "jasas@gmial.com",
+    "password": "Jasjas",
+    "phone": 86865745,
+    "address": "basanaviciaus g.",
+    "orders": [
+      1,
+      2,
+      5
+    ],
+    "registered_on": "2024-05-12",
+    "id": 4
   }
 ]

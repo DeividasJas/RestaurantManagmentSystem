@@ -12,6 +12,7 @@ import { fileURLToPath } from "url";
 import orders from "../db/orders.json" assert { type: "json" };
 import users from "../db/users.json" assert { type: "json" };
 import menus from "../db/menus.json" assert { type: "json" };
+import { log } from "console";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -164,11 +165,55 @@ router.get("/:orderId/users/:userId", (req, res) => {
 
     res.status(200).json(orderInfo);
   } catch (error) {
-    res.status(500).json({ message: "could not get specific order details" });
+    res.status(500).json({ message: 'could not get specific order details' });
     console.error(error);
   }
 });
 
 // Delete Order for a User: Uses a DELETE API to remove a specific order for a specific user from the database. The user ID and the order ID are provided as parameters, and the API deletes the order if it belongs to the user.
+// istrinti orderi id is userID, jie abu nurodyti kaip params
+
+router.delete('/:orderId/users/:userId', async (req, res) => {
+  try {
+    let { orderId, userId } = req.params
+    orderId = parseInt(orderId)
+    userId = parseInt(userId)
+    const user = users.find(user => user.id === userId)
+    const orderIndex = user.orders.findIndex(orderNum => orderNum === orderId)
+    // error check
+    if (!user) {
+      res.status(404).json({ message: "user not found" })
+      return
+    }
+    if (orderIndex === -1) {
+      res.status(404).json({ message: 'order within user not found' })
+      return
+    }
+
+    // good response
+    if (user.orders.includes(orderId)) {
+      user.orders.splice(orderIndex, 1)
+      console.log(user.orders);
+      await fs.promises.writeFile(path.join(__dirname, '../db/users.json'), JSON.stringify(users, null, 2));
+      res.status(200).json({ message: 'order successfully removed from user' })
+      return
+    }
+
+ 
+ 
+
+    // await fs.promises.writeFile(path.join(__dirname, "../db/users.json"), JSON.stringify(users, null, 2));
+
+    console.log(orderIndex);
+    // res.status(200).json({ message: 'orde' })
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'could not find specific order' })
+  }
+})
+
+
+
+
 
 export default router;

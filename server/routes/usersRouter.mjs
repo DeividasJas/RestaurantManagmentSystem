@@ -40,23 +40,25 @@ router.get("/", (req, res) => {
 // ********************************************************************
 // 2. ikelti naujus user i sistema
 
-router.post("/registration", async (req, res) => {
+router.post("/", async (req, res) => {
   try {
     const newUser = {
       ...req.body,
       registered_on: new Date().toISOString().split("T")[0],
-      id: users.length + 1,
-      orders: [],
+      id: users.length + 1
     };
 
     users.push(newUser);
 
     await fs.promises.writeFile(
-      path.join(__dirname, "./db/users.json"),
+      path.join(__dirname, "../db/users.json"),
       JSON.stringify(users, null, 2)
     );
     res.status(201).json(newUser);
-  } catch (error) {}
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({message: "something wrong"})
+  }
 });
 
 // ****************************************************************************
