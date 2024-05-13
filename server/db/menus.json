@@ -32,14 +32,25 @@
     "creationDate": "2024-05-09"
   },
   {
-    "name": "vaniles ledai",
+    "name": "Vaniles Ledai",
     "price": 5.55,
     "category": {
       "appetizer": false,
-      "main-course": false,
+      "main_course": false,
       "dessert": true
     },
     "id": 4,
     "creationDate": "2024-05-09"
+  },
+  {
+    "name": "Braskiu Ledai",
+    "price": 5.55,
+    "category": {
+      "appetizer": false,
+      "main_course": false,
+      "dessert": true
+    },
+    "id": 5,
+    "creationDate": "2024-05-13"
   }
 ]
