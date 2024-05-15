@@ -22,26 +22,26 @@ export const meniuValidationSchema = checkSchema({
       errorMessage: "Price has to be a number",
     },
   },
-  category: {
-    isObject: {
-      errorMessage: "is not object",
-    },
-  },
-  "category.appetizer": {
-    isBoolean: {
-      errorMessage: "Has to be a boolean",
-    },
-  },
-  "category.main_course": {
-    isBoolean: {
-      errorMessage: "Has to be a boolean",
-    },
-  },
-  "category.dessert": {
-    isBoolean: {
-      errorMessage: "Has to be a boolean",
-    },
-  },
+  // category: {
+  //   isObject: {
+  //     errorMessage: "is not object",
+  //   },
+  // },
+  // "category.appetizer": {
+  //   isBoolean: {
+  //     errorMessage: "Has to be a boolean",
+  //   },
+  // },
+  // "category.main_course": {
+  //   isBoolean: {
+  //     errorMessage: "Has to be a boolean",
+  //   },
+  // },
+  // "category.dessert": {
+  //   isBoolean: {
+  //     errorMessage: "Has to be a boolean",
+  //   },
+  // },
 });
 
 export const validateMenuIdSchema = [

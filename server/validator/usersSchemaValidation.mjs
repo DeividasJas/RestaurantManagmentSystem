@@ -3,9 +3,9 @@ import { checkSchema, param, oneOf } from "express-validator";
 // This is user validation -- checks if user input are valid, if yes - adding it to ./db/users.json via router then controller
 
 export const userValidationSchema = checkSchema({
-  name: {
+  username: {
     isLength: {
-      options: { min: 8, max: 20 },
+      options: { min: 2, max: 20 },
       errorMessage: "Username should be between 8 and 20 characters",
     },
     notEmpty: {

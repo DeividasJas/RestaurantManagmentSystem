@@ -1,40 +1,30 @@
-import fs, { appendFile, read } from "fs";
-import path, { dirname } from "path";
-import { fileURLToPath } from "url";
-import menus from "../db/menus.json" assert { type: "json" };
-
-const __dirname = dirname(fileURLToPath(import.meta.url));
+import menusModel from "../model/menusModels.mjs";
 
 const menusController = {
-  getMenus: (req, res, next) => {
+  getMenus: async (req, res) => {
     try {
-        // next()
-      res.status(200).json({ menus });
+      const menus = await menusModel.getMenus();
+      res.status(200).json(menus);
     } catch (error) {
       console.error(error);
       res.status(500).json({ message: "Could not retrieve data" });
     }
   },
-  sendMenu: async (req, res) => {
+  // *******************************************************************
+  // sukurti nauja menus items
+  createMenusItem: async (req, res) => {
     try {
-      // Sukurimo data
-      const creationDate = new Date().toISOString().split("T")[0];
-      // sukurti nauja id
-      const id = menus.length + 1;
+      // reikia sukurti toki item body:
+      // "id": 1,
+      // "name": "cepelinai",
+      // "description": "su mesa",
+      // "price": "10.00",
+      // "category": "appetizer"
 
-      // Sukurti nauja menu item
-      const newMenuItem = { ...req.body, id, creationDate };
+      const menusItemBody = req.body;
+      const menusItem = await menusModel.createMenusItem(menusItemBody);
 
-      // Ikeli nauja menu item i menu
-      menus.push(newMenuItem);
-
-      // console.log(req.body);
-      await fs.promises.writeFile(
-        path.join(__dirname, "../db/menus.json"),
-        JSON.stringify(menus, null, 2)
-      );
-
-      res.status(200).json({ message: newMenuItem });
+      res.status(200).json(menusItem);
     } catch (error) {
       res.status(500).json({
         message: "Could not create new item, talk to developer's team",
@@ -42,53 +32,66 @@ const menusController = {
       console.error(error);
     }
   },
-  getMenu: (req, res) => {
+
+  // *******************************************************************
+  // *******************************************************************
+  // *******************************************************************
+  // surasti menus item pagal jo ID
+
+  getMenusItemById: async (req, res) => {
     try {
       // Gauti ID is URL (param)
-      const id = parseInt(req.params.id);
-
+      const id = req.params.id;
+      console.log(id);
       // Surasti menu item pagal jo ID ir false atsakyma
-      const menuItem = menus.find((item) => item.id === id);
+      const menuItem = await menusModel.getMenusItemById(id);
       if (!menuItem) {
         res.status(404).json({ message: "Item by Id not found" });
         return;
       }
 
       // status zinute
-      res.status(200).json({ menuItem });
+      res.status(200).json(menuItem);
     } catch (error) {
       res.status(404).json({ message: "Id not found" });
       console.error(error);
     }
   },
-  updateMenu: async (req, res) => {
+  // *******************************************************************
+  // surasti menus item pagal jo pavadinima,
+  getMenusItemName: async (req, res) => {
+    try {
+      const itemName = req.params.name;
+      const menuItem = await menusModel.getMenusItemName(itemName);
+
+      console.log(itemName, menuItem);
+      if (!menuItem) {
+        res.status(404).json({ message: "Item by name not found" });
+      }
+
+      res.status(200).json(menuItem);
+    } catch (error) {
+      res.status(404).json({ message: "name not found" });
+      console.error(error);
+    }
+  },
+
+  updateMenusItem: async (req, res) => {
     try {
       // Gauti ID is URL (param)
-      const id = parseInt(req.params.id);
+      const id = req.params.id;
+      const itemBody = req.body;
 
-      // susirasti menu item kuri atnaujinsime, jeigu nera grazinti error message
-      const menuItemIndex = menus.findIndex((item) => item.id === id);
-      if (menuItemIndex === -1) {
-        res.status(404).json({ message: "Menu item not found" });
+      // ikelti id ir itembody i menusModel, jis naudodamas query irasys nauja data i musu lentele
+      const menuItem = await menusModel.updateMenusItem(id, itemBody);
+
+      if (!menuItem) {
+        res.status(404).json({ message: "menu item not found" });
+        return;
       }
-      // sukurti menu item nauja informacija
-      // const updatedMenuItem = { ...req.body, id };
 
-      // menus[menuItemIndex] = updatedMenuItem;
-      // updatedMenuItem.registered_on = menus[menuItemIndex].registered_on;
-
-      // updatedMenuItem.creationDate = menus[menuItemIndex].creationDate
-
-      // menus[menuItemIndex] = updatedMenuItem
-
-      menus[menuItemIndex] = { ...menus[menuItemIndex], ...req.body, id };
-
-      await fs.promises.writeFile(
-        path.join(__dirname, "../db/menus.json"),
-        JSON.stringify(menus, null, 2)
-      );
-
-      res.status(201).json({ message: updatedMenuItem });
+      // patikrinima naujus duomenis
+      res.status(201).json(menuItem);
     } catch (error) {
       res.status(404).json({ message: "Id not found" });
       console.error(error);
@@ -96,22 +99,15 @@ const menusController = {
   },
   deleteMenu: async (req, res) => {
     try {
-      const id = parseInt(req.params.id);
-      const menuItemIndex = menus.findIndex((item) => item.id === id);
-      if (menuItemIndex === -1) {
-        res.status(400).json({ message: "Menu item not found" });
-        return;
-      }
+      const id = req.params.id;
 
-      menus.splice(menuItemIndex, 1);
+      const deletedItem = await menusModel.deleteMenuItem(id)
+      // if (menuItemIndex === -1) {
+      //   res.status(400).json({ message: "Menu item not found" });
+      //   return;
+      // }
 
-      await fs.promises.writeFile(
-        path.join(__dirname, "../db/menus.json"),
-        JSON.stringify(menus, null, 2)
-      );
-
-      // res.status(200).json({ message: "Item successfully deleted" })
-      res.status(200).json({ message: menuItemIndex });
+      res.status(200).json(deletedItem);
     } catch (error) {
       res.status(400).json({ message: "Menu item not found" });
       console.error(error);
