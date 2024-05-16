@@ -1,6 +1,6 @@
 import { pool } from "../db/postgresConnection.mjs";
 
-const userModel = {
+const usersModel = {
   getUsers: async () => {
     try {
       const users = await pool.query("SELECT * FROM users");
@@ -82,4 +82,4 @@ const userModel = {
   },
 };
 
-export default userModel;
+export default usersModel;

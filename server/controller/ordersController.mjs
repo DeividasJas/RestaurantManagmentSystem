@@ -1,184 +1,132 @@
-// import fs from "fs";
-// import path, { dirname } from "path";
-// import { fileURLToPath } from "url";
-// import orders from "../db/orders.json" assert { type: "json" };
-// import users from "../db/users.json" assert { type: "json" };
-// import menus from "../db/menus.json" assert { type: "json" };
+import ordersModels from "../model/ordersModels.mjs";
+import menusModel from "../model/menusModels.mjs";
+import usersModel from "../model/usersModel.mjs";
 
-// const __dirname = dirname(fileURLToPath(import.meta.url));
+// userController i sita object sukeli visas funkcijas
 
-// // userController i sita object sukeli visas funkcijas
+const ordersController = {
+  //   Veikia ++++++++++++++++++++++++++++++++++++++++++++++++++++
+  getOrders: async (req, res) => {
+    try {
+      const allOrders = await ordersModels.getOrders();
+      res.status(200).json(allOrders);
+    } catch (error) {
+      console.error(error);
+    }
+  },
 
-// const ordersController = {
-//   getOrders: (req, res) => {
-//     try {
-//       res.status(200).json(orders);
-//     } catch (error) {
-//       console.error(error);
-//     }
-//   },
-//   sendOrder: async (req, res) => {
-//     try {
-//       // All params and query's values
-//       const userId = Number(req.params.userId);
-//       const orderBody = [...req.body.items];
-//       const orderId = orders.length + 1;
+  //   Veikia ++++++++++++++++++++++++++++++++++++++++++++++++++++
+  createOrder: async (req, res) => {
+    try {
+      // All params and query's values
+      const userId = req.params.userId;
+      const menuItemId = req.params.menuId;
+      const { quantity } = req.body;
 
-//       //  change orders
-//       // add +1 to object key
-//       // const orderItems = [...orderBody]
-//       // Object.keys(orderBody).forEach((key) => {
-//       //   const newKeyValue = parseInt(key) +1
-//       //   orderItems[newKeyValue.toString()] = orderBody[key]
-//       // })
+      //   const order = { orderId, userId, orderBody };
 
-//       // change order
-//       const order = { orderId, userId, orderBody };
-//       orders.push(order);
+      const user = await usersModel.getUserById(userId);
+      const menuItem = await menusModel.getMenusItemById(menuItemId);
 
-//       // change user
-//       const user = users.find((user) => user.id === userId);
-//       user.orders.push(orderId);
+      console.log(user);
 
-//       console.log(user);
-//       await fs.promises.writeFile(
-//         path.join(__dirname, "../db/users.json"),
-//         JSON.stringify(users, null, 2)
-//       );
-//       await fs.promises.writeFile(
-//         path.join(__dirname, "../db/orders.json"),
-//         JSON.stringify(orders, null, 2)
-//       );
+      const orderItem = await ordersModels.createOrder(
+        user.id,
+        menuItem.id,
+        quantity
+      );
 
-//       res.status(200).json({ message: "order created successfully" });
-//     } catch (error) {
-//       res.status(500).json({ message: "could not create order" });
-//       console.error(error);
-//     }
-//   },
-//   getOrder: async (req, res) => {
-//     try {
-//       const orderId = parseInt(req.params.orderId);
+      res.status(200).json(orderItem);
+    } catch (error) {
+      res.status(500).json({ message: "could not create order" });
+      console.error(error);
+    }
+  },
+  getOrderById: async (req, res) => {
+    try {
+      const orderId = req.params.orderId;
+      const orderById = await ordersModels.getOrderById(orderId);
 
-//       const order = orders[orderId - 1];
-//       const userId = order.orderId;
+      //   //   zinai ka uzsisake
+      //   const menuItem = await menusModel.getMenusItemById(
+      //     orderById.menu_item_id
+      //   );
 
-//       // item content
-//       // const items = [
-//       //   {menuItemId: order.orderBody.menuItemId}
+      res.status(200).json(orderById);
+    } catch (error) {
+      res.status(500).json({ message: "could not get order details" });
+      console.error(error);
+    }
+  },
+  getOrdersByUser: async (req, res) => {
+    try {
+      const username = req.params.username;
+      // console.log(username);
+      const allUserOrders = await ordersModels.getOrdersByUser(username);
+      console.log(allUserOrders);
 
-//       // ]
-//       const items = order.orderBody.map((item) => {
-//         return item;
-//       });
+      res.status(200).json(allUserOrders);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: "could not get specific order details" });
+    }
+},
 
-//       const orderItemsInfo = [];
+getOrdersByOrderIdUserId: async () => {
+    try {
+        const userId = req.params.userId
+        const orderId = req.params.orderId
+        
+        const ordersByOrderIdAndUserId = await ordersModels.getOrdersByOrderIdUserId()
+    } catch (error) {
+        
+        console.error(error);
+        res.status(500).json({ message: "could not get specific order details" });
+    }
+  },
+  deleteOrderByUser: async (req, res) => {
+    try {
+      let { orderId, userId } = req.params;
+      orderId = parseInt(orderId);
+      userId = parseInt(userId);
+      const user = users.find((user) => user.id === userId);
+      const orderIndex = user.orders.findIndex(
+        (orderNum) => orderNum === orderId
+      );
+      // error check
+      if (!user) {
+        res.status(404).json({ message: "user not found" });
+        return;
+      }
+      if (orderIndex === -1) {
+        res.status(404).json({ message: "order within user not found" });
+        return;
+      }
 
-//       for (let i = 0; i < items.length; i++) {
-//         orderItemsInfo.push({
-//           menuItemId: items[i].menuItemId,
-//           quantity: items[i].quantity,
-//           item: menus[items[i].menuItemId],
-//         });
-//       }
+      // good response
+      if (user.orders.includes(orderId)) {
+        user.orders.splice(orderIndex, 1);
+        console.log(user.orders);
+        await fs.promises.writeFile(
+          path.join(__dirname, "../db/users.json"),
+          JSON.stringify(users, null, 2)
+        );
+        res
+          .status(200)
+          .json({ message: "order successfully removed from user" });
+        return;
+      }
 
-//       const orderInfo = { orderId, userId, orderItemsInfo };
+      // await fs.promises.writeFile(path.join(__dirname, "../db/users.json"), JSON.stringify(users, null, 2));
 
-//       console.log(orderInfo);
-//       res.status(200).json(orderInfo);
-//     } catch (error) {
-//       res.status(500).json({ message: "could not get order details" });
-//       console.error(error);
-//     }
-//   },
-//   getOrderByUser: (req, res) => {
-//     try {
-//       const orderId = parseInt(req.params.orderId);
-//       const userId = parseInt(req.params.userId);
+      console.log(orderIndex);
+      // res.status(200).json({ message: 'orde' })
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: "could not find specific order" });
+    }
+  },
+};
 
-//       const order = orders.find((order) => order.orderId === orderId);
-
-//       const user = users.find((user) => user.id === userId);
-
-//       if (!user || !order) {
-//         res.status(404).json({ message: "user or order id's not found" });
-//         return;
-//       }
-
-//       const items = order.orderBody.map((item) => {
-//         const menuItems = menus.find(
-//           (menuItem) => menuItem.id === item.menuItemId
-//         );
-//         return {
-//           ...item,
-//           name: menuItems.name,
-//         };
-//       });
-
-//       // const orderInfo = user.orders.map()
-//       // const answer = {
-//       //   userid: users[user].id,
-//       //   orderid: orderId,
-//       //   // orderContent:
-//       // };
-
-//       const orderInfo = {
-//         orderId,
-//         userId,
-//         Items: items,
-//       };
-
-//       console.log(orderInfo);
-
-//       res.status(200).json(orderInfo);
-//     } catch (error) {
-//       res.status(500).json({ message: "could not get specific order details" });
-//       console.error(error);
-//     }
-//   },
-//   deleteOrderByUser: async (req, res) => {
-//     try {
-//       let { orderId, userId } = req.params;
-//       orderId = parseInt(orderId);
-//       userId = parseInt(userId);
-//       const user = users.find((user) => user.id === userId);
-//       const orderIndex = user.orders.findIndex(
-//         (orderNum) => orderNum === orderId
-//       );
-//       // error check
-//       if (!user) {
-//         res.status(404).json({ message: "user not found" });
-//         return;
-//       }
-//       if (orderIndex === -1) {
-//         res.status(404).json({ message: "order within user not found" });
-//         return;
-//       }
-
-//       // good response
-//       if (user.orders.includes(orderId)) {
-//         user.orders.splice(orderIndex, 1);
-//         console.log(user.orders);
-//         await fs.promises.writeFile(
-//           path.join(__dirname, "../db/users.json"),
-//           JSON.stringify(users, null, 2)
-//         );
-//         res
-//           .status(200)
-//           .json({ message: "order successfully removed from user" });
-//         return;
-//       }
-
-//       // await fs.promises.writeFile(path.join(__dirname, "../db/users.json"), JSON.stringify(users, null, 2));
-
-//       console.log(orderIndex);
-//       // res.status(200).json({ message: 'orde' })
-//     } catch (error) {
-//       console.error(error);
-//       res.status(500).json({ message: "could not find specific order" });
-//     }
-//   },
-// };
-
-// // exportas
-// export default ordersController;
+// exportas
+export default ordersController;
